@@ -1,0 +1,48 @@
+name: kubebuilder-tutorial
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "1.13"
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-kubebuilder-tutorial-${{ hashFiles('go.sum') }}
+          restore-keys: ${{ runner.os }}-kubebuilder-tutorial-
+
+      - name: Install tools
+        run: ./scripts/install.sh
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Lint
+        run: |
+          if [[ -n "$(gofmt -l .)" ]]; then
+            exit 1
+          fi
+
+      - name: Ensure generated code
+        run: |
+          make generate manifests
+          git add -N .
+          if ! git diff --exit-code --name-only; then
+            echo "> Generated code not up to date"
+            exit 1
+          fi
+
+      - name: Run tests
+        run: make test
+
+      - name: Build binary
+        run: make manager
+
+      - name: Build image
+        run: make docker-build
