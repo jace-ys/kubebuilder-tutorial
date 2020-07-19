@@ -62,8 +62,7 @@ docker-build: test
 docker-push:
 	docker push ${IMG}
 
-# find or download controller-gen
-# download controller-gen if necessary
+# Find or download controller-gen
 controller-gen:
 ifeq (, $(shell which controller-gen))
 	@{ \
