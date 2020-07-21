@@ -25,6 +25,10 @@ manager: generate fmt vet
 run: generate fmt vet manifests
 	go run ./main.go
 
+cluster: config/vendor
+	kind create cluster --image kindest/node:v1.16.9
+	kubectl apply -f config/vendor
+
 # Install CRDs into a cluster
 install: manifests
 	kustomize build config/crd | kubectl apply -f -
@@ -61,6 +65,10 @@ docker-build: test
 # Push the docker image
 docker-push:
 	docker push ${IMG}
+
+vendor:
+	curl -sL https://github.com/jetstack/cert-manager/releases/download/v0.15.2/cert-manager.yaml -o config/vendor/cert-manager.yaml
+	curl -sL https://raw.githubusercontent.com/coreos/prometheus-operator/v0.40.0/bundle.yaml -o config/vendor/prometheus.yaml
 
 # Find or download controller-gen
 controller-gen:
