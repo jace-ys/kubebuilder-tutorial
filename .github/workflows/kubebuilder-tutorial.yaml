@@ -10,7 +10,6 @@ jobs:
       - uses: actions/setup-go@v2
         with:
           go-version: "1.13"
-
       - uses: actions/cache@v1
         with:
           path: ~/go/pkg/mod
@@ -23,20 +22,15 @@ jobs:
       - name: Install dependencies
         run: go mod download
 
-      - name: Lint
-        run: |
-          if [[ -n "$(gofmt -l .)" ]]; then
-            exit 1
-          fi
-
       - name: Ensure generated code
         run: |
           make generate manifests
-          git add -N .
-          if ! git diff --exit-code --name-only; then
-            echo "> Generated code not up to date"
-            exit 1
-          fi
+          git add -N . && git diff --exit-code --name-only
+
+      - name: Lint
+        run: |
+          make fmt
+          git diff --exit-code --name-only
 
       - name: Run tests
         run: make test

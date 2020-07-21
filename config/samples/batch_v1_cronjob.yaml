@@ -1,0 +1,19 @@
+apiVersion: batch.tutorial.kubebuilder.io/v1
+kind: CronJob
+metadata:
+  name: cronjob-sample
+spec:
+  schedule: "*/1 * * * *"
+  startingDeadlineSeconds: 60
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: hello
+              image: busybox
+              args:
+                - /bin/sh
+                - -c
+                - date; echo "Hello, Kubebuilder!"
+          restartPolicy: OnFailure
