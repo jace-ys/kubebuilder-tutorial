@@ -107,6 +107,7 @@ func (r *CronJobReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	var childJobs kbatchv1.JobList
 	if err := r.List(ctx, &childJobs, client.InNamespace(req.Namespace), client.MatchingFields{jobOwnerKey: req.Name}); err != nil {
 		log.Error(err, "unable to list child Jobs")
+		return ctrl.Result{}, err
 	}
 
 	// Get all active Jobs
