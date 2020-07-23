@@ -20,7 +20,9 @@ jobs:
         run: ./scripts/install.sh
 
       - name: Install dependencies
-        run: go mod download
+        run: |
+          go mod tidy
+          git diff --exit-code --name-only
 
       - name: Ensure generated code
         run: |
